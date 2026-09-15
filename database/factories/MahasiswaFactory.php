@@ -1,0 +1,22 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Mahasiswa>
+ */
+class MahasiswaFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'nim'      => fake()->unique()->numerify('2024##0###'),
+            'nama'     => fake()->name(),
+            'email'    => fake()->unique()->safeEmail(),
+            'prodi'    => fake()->randomElement(['Teknik Informatika', 'Sistem Informasi', 'Teknik Komputer']),
+            'semester' => fake()->numberBetween(1, 8),
+        ];
+    }
+}
