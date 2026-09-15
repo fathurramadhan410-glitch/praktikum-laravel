@@ -32,7 +32,7 @@ php artisan migrate / migrate:status / migrate:rollback
 php artisan db:seed / php artisan migrate:fresh --seed
 php artisan tinker / php artisan route:list / php artisan serve
 
-Cara Menjalankan Project
+Cara Menjalankan Project :
 composer install
 Salin .env.example menjadi .env, sesuaikan konfigurasi database, lalu jalankan:php artisan key:generate
 php artisan migrate:fresh --seed
