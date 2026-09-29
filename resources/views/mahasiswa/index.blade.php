@@ -1,4 +1,4 @@
-<h1>Data Mahasiswa dan Mata Kuliah yang Diambil</h1>
+ <!-- <h1>Data Mahasiswa dan Mata Kuliah yang Diambil</h1>
 <table border="1" cellpadding="8">
     <tr>
         <th>NIM</th>
@@ -23,3 +23,8 @@
         @endforeach
     @endforeach
 </table>
+
+<h1>hhai</h1>  -->
+
+<h1>Daftar Mahasiswa</h1>
+<p>Jumlah data: {{ $mahasiswa->count() }}</p>
