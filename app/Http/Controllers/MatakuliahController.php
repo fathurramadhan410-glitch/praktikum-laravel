@@ -13,6 +13,11 @@ class MatakuliahController extends Controller
         return view('matakuliah.index', compact('data'));
     }
 
+    //  public function show($kode)
+    // {
+    //     return "Halaman detail mata kuliah dengan kode: {$kode}";
+    // }
+
     public function create()
     {
         return view('matakuliah.create');
@@ -21,6 +26,11 @@ class MatakuliahController extends Controller
     public function store(Request $request)
     {
         Matakuliah::create($request->all());
-        return redirect('/matakuliah');
+        return redirect()->route('matakuliah.index');
+    }
+
+    public function show(Matakuliah $matakuliah)   
+    {
+        return view('matakuliah.show', compact('matakuliah'));
     }
 }
