@@ -20,4 +20,16 @@ class Matakuliah extends Model
     {
         return $this->belongsToMany(Mahasiswa::class);
     }
+
+    public function nilai()
+{
+    return $this->hasMany(NilaiMatakuliah::class);
+}
+
+public function index()
+{
+    $matakuliah = Matakuliah::all();
+    return view('matakuliah.index', compact('matakuliah'));
+}
+
 }

@@ -11,6 +11,11 @@ class Mahasiswa extends Model
 
     protected $fillable = ['nim', 'nama', 'email', 'prodi', 'semester'];
 
+    public function nilai()
+    {
+        return $this->hasMany(NilaiMatakuliah::class);
+    }
+    
     public function matakuliahs()
     {
         return $this->belongsToMany(Matakuliah::class);

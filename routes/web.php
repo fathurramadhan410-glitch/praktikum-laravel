@@ -1,15 +1,32 @@
 <?php
 
-// use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\MatakuliahController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\SapaController;
+use App\Http\Controllers\LatihanController;
+use App\Http\Controllers\StatistikMahasiswaController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\HitungTotalSksController;
+use App\Http\Controllers\Laporan\RekapController;
+use App\Http\Controllers\QueryBuilderDemoController;
+
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
 
+/*
+|--------------------------------------------------------------------------
+| MODUL SEBELUMNYA (Routing & Blade Templating)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home', [
+        'totalMahasiswa'  => Mahasiswa::count(),
+        'totalMatakuliah' => Matakuliah::count(),
+    ]);
+})->name('home');
 
 Route::get('/halo', function () {
     return 'Halo, ini adalah route pertama saya!';
@@ -34,18 +51,6 @@ Route::get('/tentang', function () {
     return 'Halaman ini dibuat untuk memenuhi tugas Praktikum 4 - Pemrograman Web.';
 });
 
-
-// Route::prefix('akademik')->group(function () {
-//     Route::get('/mahasiswa', [MahasiswaController::class, 'index'])
-//         ->name('mahasiswa.index');
-
-Route::get('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'show'])
-        ->name('mahasiswa.show');
-   
-
-Route::resource('matakuliah', MatakuliahController::class)
-    ->only(['index', 'show', 'create', 'store']);
-
 Route::get('/profil-mahasiswa', function () {
     return view('profil')
         ->with('nama', 'Fathur Ramadhan')
@@ -53,73 +58,87 @@ Route::get('/profil-mahasiswa', function () {
         ->with('prodi', 'Sistem Informasi Kota Cerdas');
 });
 
-Route::get('/statistik', function () {
-    return view('akademik.statistik', [
-        'totalMahasiswa'  => Mahasiswa::count(),
-        'totalMatakuliah' => Matakuliah::count(),
-    ]);
-});
-
 Route::get('/daftar-mahasiswa', function () {
     $mahasiswa = Mahasiswa::all();
-
-    // Simulasi nilai null HANYA di memori (tanpa ->save())
-    // karena kolom nama di database NOT NULL
-    $dummy = $mahasiswa->firstWhere('nim', 'UJI00001');
-    if ($dummy) {
-        $dummy->nama = null;
-    }
-
     $mhsXss = Mahasiswa::where('nim', 'UJI00001')->first();
     return view('daftar-mahasiswa', compact('mahasiswa', 'mhsXss'));
 });
 
+/*
+|--------------------------------------------------------------------------
+| PRAKTIKUM 1 & 2: KONSEP & PENULISAN CONTROLLER
+|--------------------------------------------------------------------------
+*/
 
-// ===== PROYEK AKHIR: 2 modul data dengan Route Resource =====
-Route::resource('mahasiswa', MahasiswaController::class)->only(['index', 'show']);
+Route::get('/sapa-closure', function () {
+    $nama  = 'Fathur Ramadhan';
+    $pesan = "Halo, {$nama}! Ini ditulis langsung di route.";
+    return $pesan;
+});
 
-Route::resource('matakuliah', MatakuliahController::class)
-    ->only(['index', 'show', 'create', 'store']);
+Route::get('/sapa-controller', [SapaController::class, 'index']);
 
-// ===== Fallback (bukti Praktikum 3) =====
+Route::get('/perkenalan', [LatihanController::class, 'index']);
+
+Route::get('/mahasiswa-uji', function () {
+    return view('mahasiswa.form-uji');
+});
+
+Route::post('/mahasiswa-uji', [MahasiswaController::class, 'storeUji']);
+
+Route::get('/mahasiswa-api', [MahasiswaController::class, 'apiIndex']);
+
+Route::get('/mahasiswa-form-cari', function () {
+    return view('mahasiswa.form-cari');
+});
+
+/*
+|--------------------------------------------------------------------------
+| PRAKTIKUM 3: PEMBUATAN CONTROLLER
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/statistik', StatistikMahasiswaController::class);
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);
+
+Route::get('/total-sks', HitungTotalSksController::class);
+
+Route::get('/laporan/rekap', [RekapController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| PRAKTIKUM 5: QUERY BUILDER
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/demo/mahasiswa',        [QueryBuilderDemoController::class, 'tampilkanSemua']);
+Route::get('/demo/filter',           [QueryBuilderDemoController::class, 'tampilkanFilter']);
+Route::get('/demo/statistik-prodi',  [QueryBuilderDemoController::class, 'statistikProdi']);
+Route::get('/demo/tambah',           [QueryBuilderDemoController::class, 'formTambah']);
+Route::post('/demo/simpan',          [QueryBuilderDemoController::class, 'simpan']);
+Route::get('/demo/ubah/{id}',        [QueryBuilderDemoController::class, 'perbarui']);
+Route::get('/demo/hapus/{id}',       [QueryBuilderDemoController::class, 'hapus']);
+Route::get('/demo/filter-ti',        [QueryBuilderDemoController::class, 'filterTiSemester']);
+Route::get('/demo/rekap-prodi',      [QueryBuilderDemoController::class, 'rekapProdi']);
+Route::get('/demo/paginasi',         [QueryBuilderDemoController::class, 'daftarPaginasi']);
+
+/*
+|--------------------------------------------------------------------------
+| PRAKTIKUM 7: RESOURCE CRUD ELOQUENT (satu definisi, lengkap)
+|--------------------------------------------------------------------------
+*/
+
+Route::resource('mahasiswa', MahasiswaController::class);
+
+Route::resource('matakuliah', MatakuliahController::class);
+
+/*
+|--------------------------------------------------------------------------
+| FALLBACK (bukti Praktikum 3)
+|--------------------------------------------------------------------------
+*/
+
 Route::fallback(function () {
     return 'Halaman yang Anda cari tidak ditemukan.';
 });
-
-Route::get('/', function () {
-    return view('home', [
-        'totalMahasiswa'  => Mahasiswa::count(),
-        'totalMatakuliah' => Matakuliah::count(),
-    ]);
-})->name('home');
-
-// Route::get('/mahasiswa/{nim}', [MahasiswaController::class, 'show'])
-    //     ->where('nim', '[0-9]+')
-    //     ->name('mahasiswa.show');
-    
-    // Route::get('/matakuliah', [MatakuliahController::class, 'index'])
-    //     ->name('matakuliah.index');
-
-    // Route::get('/matakuliah/{kode}', [MatakuliahController::class, 'show'])
-    //     ->name('matakuliah.show');
-
-
-// Route::resource('mahasiswa', MahasiswaController::class);
-
-// Route::get('/sapa', function () {
-// return view('sapa', ['nama' => 'Fathur Ramadhan']);
-// });
-
-// Route::prefix('admin')->name('admin.')->group(function () {
-// Route::get('/dashboard', function () {
-// return 'Dashboard Admin';
-// })->name('dashboard');
-// });
-
-// Route::get('/mahasiswa', function () {
-//     $data = \App\Models\Mahasiswa::with('matakuliahs.user')->get();
-//     return view('mahasiswa.index', compact('data'));
-// });
-
-// Route::get('/matakuliah', [MatakuliahController::class, 'index']);
-// Route::get('/matakuliah/create', [MatakuliahController::class, 'create']);

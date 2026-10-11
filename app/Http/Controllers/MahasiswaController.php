@@ -1,55 +1,90 @@
 <?php
+
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
+
 class MahasiswaController extends Controller
 {
-    // public function index()
-    // {
-    //     return 'index: Halaman daftar seleuruh mahasiswa';
-    // }
-    // public function show($nim)
-    // {
-    //     return "show: Halaman detail mahasiswa dengan NIM: $nim";
-    // }
-    public function create()
-    { 
-        return 'create: form tambah mahasiswa';
-    }
-    public function store(Request $request)
-    { 
-        return 'store: simpan data baru'; 
-    }
-    public function edit($id)
-    { 
-        return "edit: form edit mahasiswa id {$id}";
-    }
-    public function update(Request $request, $id)
-    {
-    return "update: perbarui data id {$id}";
-    }
-    public function destroy($id) 
-    { 
-        return "destroy: hapus data id {$id}";
-    }
-    public function show(Mahasiswa $mahasiswa)
-    {
-        return view('mahasiswa.show', compact('mahasiswa'));
-    }
-
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         $mahasiswa = Mahasiswa::all();
         return view('mahasiswa.index', compact('mahasiswa'));
     }
 
-// public function index()
-// // {
-// //     // $mahasiswa = Mahasiswa::all();                       // versi normal
-// //     $mahasiswa = Mahasiswa::where('id', 0)->get();          // SIMULASI kosong (Langkah 2 modul)
-// //     return view('mahasiswa.index', compact('mahasiswa'));
-// // }
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+         return view('mahasiswa.create');
+    }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        Mahasiswa::create($request->only(['nim', 'nama', 'email', 'prodi', 'semester']));
+        return redirect()->route('mahasiswa.index')->with('pesan', 'Data berhasil ditambahkan');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    // public function show(Mahasiswa $mahasiswa)
+    // {
+    //     return view('mahasiswa.show', compact('mahasiswa'));
+    // }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Mahasiswa $mahasiswa)
+    {
+         return view('mahasiswa.edit', compact('mahasiswa'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Mahasiswa $mahasiswa)
+    {
+         $mahasiswa->update($request->only(['nim', 'nama', 'email', 'prodi', 'semester']));
+        return redirect()->route('mahasiswa.index')->with('pesan', 'Data berhasil diperbarui');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Mahasiswa $mahasiswa)
+    {
+        $mahasiswa->delete();
+        return redirect()->route('mahasiswa.index')->with('pesan', 'Data berhasil dihapus');
+    }
+
+    public function cariMahasiswa(Request $request)
+    {
+        $kataKunci = $request->query('nama');
+        return "Mencari mahasiswa dengan kata kunci: {$kataKunci}";
+    }
+
+    public function storeUji(Request $request)
+{
+    $nama = $request->input('nama');
+    $nim  = $request->input('nim');
+    return "Data yang diterima -> NIM: {$nim}, Nama: {$nama}";
 }
 
-
+public function show(Mahasiswa $mahasiswa)
+{
+     
+    $mahasiswa = Mahasiswa::with('nilai.matakuliah')->findOrFail($mahasiswa->id);
+    return view('mahasiswa.show', compact('mahasiswa'));
+}
+    
+}
